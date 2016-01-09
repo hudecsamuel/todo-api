@@ -57,7 +57,6 @@ app.delete('/todos/:id', function(req, res){
     res.status(404).json({"error": "No todo with specified id found"});
   }
 
-
 });
 
 
