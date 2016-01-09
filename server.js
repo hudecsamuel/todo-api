@@ -4,18 +4,46 @@ var PORT = process.env.PORT || 3001;
 
 var todos = [
   {
-  id: 1,
-  description: 'Meet mon for lunch',
-  completed: false
-},
-{
-  id: 2,
-  description: 'Meet mom for lunch',
-  completed: false
-}];
+    id: 1,
+    description: 'Meet mom for lunch',
+    completed: false
+  },
+  {
+    id: 2,
+    description: 'Go to market',
+    completed: false
+  },
+  {
+    id: 3,
+    description: 'Feed the dogs',
+    completed: true
+  }
+];
 
 app.get('/', function(req, res){
   res.send('todo api root')
+});
+
+app.get('/todos', function(req, res){
+  res.json(todos);
+});
+
+app.get('/todos/:id', function(req, res){
+  var todoId = parseInt(req.params.id);
+  var matchedTodo;
+
+  todos.forEach(function(todo){
+    if(todo.id === todoId){
+      matchedTodo = todo;
+    }
+  });
+
+  if(matchedTodo){
+    res.json(matchedTodo);
+  } else {
+    res.status(404).send();
+  }
+
 });
 
 app.listen(PORT, function(){
