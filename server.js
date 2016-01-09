@@ -26,7 +26,7 @@ app.get('/todos/:id', function(req, res){
   if(matchedTodo){
     res.json(matchedTodo);
   } else {
-    res.status(404).json("error": "No todo with specified id found");
+    res.status(404).json({"error": "No todo with specified id found"});
   }
 });
 
