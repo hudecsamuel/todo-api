@@ -26,7 +26,7 @@ app.get('/todos/:id', function(req, res){
   if(matchedTodo){
     res.json(matchedTodo);
   } else {
-    res.status(404).send();
+    res.status(404).json("error": "No todo with specified id found");
   }
 });
 
@@ -35,7 +35,7 @@ app.post('/todos', function(req, res){
   var body = req.body;
   body = _.pick(body, 'description', 'completed');
   if(!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0){
-    return res.status(400).send();
+    return res.status(400).json({"error": "Invalid data in requested fields"});
   }
 
   body.description = body.description.trim();
@@ -54,7 +54,7 @@ app.delete('/todos/:id', function(req, res){
     todos = _.without(todos, matchedTodo);
     res.json(matchedTodo);
   } else {
-    res.status(404).send();
+    res.status(404).json({"error": "No todo with specified id found"});
   }
 
 
