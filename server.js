@@ -49,11 +49,12 @@ app.get('/todos/:id', function(req, res){
   var todoId = parseInt(req.params.id);
 
   db.todo.findById(todoId).then(function(todo){
+    
     if(!!todo){
       //  res.status(401).json(todo);
       res.json(todo.toJSON());
     } else {
-      res.status(404).json({"error": "Todo not found." + err})
+      res.status(404).json({"error": "Todo not found."})
     }
   }, function(err){
     res.status(500).json({"error": err})
