@@ -8,7 +8,7 @@ if (env === 'production') {
   });
 } else {
   sequelize = new Sequelize(undefined, undefined, undefined, {
-    'dialect': 'postgres',
+    'dialect': 'sqlite',
     'storage': __dirname+'/data/dev-todo-api.sqlite'
   });
 }

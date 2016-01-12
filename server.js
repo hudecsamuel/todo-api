@@ -32,9 +32,8 @@ app.get('/todos', function(req, res){
   }
 
   db.todo.findAll({where: where}).then(function(todos){
-
     if(!!todos){
-      res.json(todos.toJSON());
+      res.json(todos);
     } else {
       res.status(404).json({"error": "Todo not found."})
     }
