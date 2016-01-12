@@ -98,30 +98,32 @@ app.delete('/todos/:id', function(req, res){
 //PUT /todos/:id
 app.put('/todos/:id', function(req, res){
   var todoId = parseInt(req.params.id);
-  var matchedTodo = _.findWhere(todos, {id: todoId});
-
-  if(!matchedTodo){
-    return res.status(404).json({"error": "No todo with specified id found"});
-  }
-
   var body = _.pick(req.body, 'description', 'completed');
-  var validAttributes = {};
+  var attributes = {};
 
-  if(body.hasOwnProperty('completed') && _.isBoolean(body.completed)){
-    validAttributes.completed = body.completed;
-  } else if(body.hasOwnProperty('completed')){
-    return res.status(400).json({"error": "Invalid data in 'completed' field"});
+  if(body.hasOwnProperty('completed')){
+    attributes.completed = body.completed;
   }
 
-  if(body.hasOwnProperty('description') && _.isString(body.description) && body.description.trim().length > 0){
-    validAttributes.description = body.description.trim();
-  } else if(body.hasOwnProperty('description')){
-    return res.status(400).json({"error": "Invalid data in 'description' field"});
+  if(body.hasOwnProperty('description')){
+    attributes.description = body.description;
   }
 
-  _.extend(matchedTodo, validAttributes);
+  db.todo.findById(todoId)
+  .then(function(todo){
+    if(todo){
+      todo.update(attributes).then(function(todo){
+        res.json(todo.toJSON());
+      }, function(err){
+        res.status(err.status).json({"error": err.message});
+      });
+    } else {
+      res.status(404).json({"error": "Todo with specified id not found."})
+    }
+  }, function(err){
+    res.status(err.status).json({"error": err.message});
+  });
 
-  res.json(matchedTodo);
 
 });
 
