@@ -124,6 +124,19 @@ app.put('/todos/:id', function(req, res){
     res.status(err.status).json({"error": err.message});
   });
 
+});
+
+app.post('/users', function(req, res){
+  var body = _.pick(req.body, 'email', 'password');
+
+  db.user.create({
+    email: body.email,
+    password: body.password
+  }).then(function(user){
+    res.json(user.toJSON());
+  },function(e){
+    res.status(400).json(e);
+  });
 
 });
 
