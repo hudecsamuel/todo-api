@@ -49,6 +49,9 @@ module.exports = function(sequelize, DataTypes) {
               var error = new Error({status:400, message: "Invalid email or password field."});
               return reject(error);
             }
+          
+            body.email = body.email.toLowerCase();
+
 
             user.findOne({where: {
               email: body.email
