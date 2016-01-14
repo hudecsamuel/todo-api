@@ -157,18 +157,31 @@ app.post('/users', function(req, res){
 //POST /users/login
 app.post('/users/login', function(req, res){
   var body = _.pick(req.body, 'email', 'password');
+  var userInstance;
 
   db.user.authenticate(body).then(function(user){
     var token = user.generateToken('authentication');
+    userInstance = user;
+    return db.token.create({
+      token: token
+    });
 
-    if (typeof token !== 'undefined'){
-      res.header('Auth', token).json(user.toPublicJSON());
-    }
+  }).then(function(tokenInstance){
+       res.header('Auth', tokenInstance.get('token')).json(userInstance.toPublicJSON());
 
+  }).catch(function(error){
+    console.log(error);
     res.status(401).send();
+  });
 
-  }, function(error){
-    res.status(401).send();
+});
+
+app.delete('/users/login', middleware.requireAuthentication, function(req, res){
+
+  req.token.destroy().then(function(){
+    res.status(204).send();
+  }).catch(function(e){
+    res.status(500).send();
   });
 
 });
