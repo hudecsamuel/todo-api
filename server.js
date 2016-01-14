@@ -1,6 +1,6 @@
 var express = require('express');
 var app = express();
-var PORT = process.env.PORT || 3001;
+var PORT = process.env.PORT || 3002;
 var bodyParser = require('body-parser');
 var _ = require('underscore');
 var db = require('./db.js');
@@ -20,6 +20,7 @@ app.get('/', function(req, res){
 app.get('/todos', middleware.requireAuthentication, function(req, res){
   var query = req.query;
   var where = {};
+  where.userId = req.user.id;
 
   if(query.hasOwnProperty('completed') && query.completed === 'true'){
     where.completed = true;
@@ -68,11 +69,12 @@ app.get('/todos/:id', middleware.requireAuthentication, function(req, res){
 app.post('/todos', middleware.requireAuthentication, function(req, res){
   var body = _.pick(req.body, 'description', 'completed');
 
-  db.todo.create({
-    description: body.description,
-    completed: body.completed
-  }).then(function(todo){
-    res.json(todo.toJSON());
+  db.todo.create(body).then(function(todo){
+    req.user.addTodo(todo).then(function(){
+      return todo.reload();
+    }).then(function(todo){
+      res.json(todo.toJSON());
+    });
   },function(e){
     res.status(e.status).json(e.message);
   });
@@ -162,7 +164,9 @@ app.post('/users/login', function(req, res){
 
 });
 
-db.sequelize.sync({force: true}).then(function(){
+db.sequelize.sync({
+  // force: true
+}).then(function(){
   app.listen(PORT, function(){
     console.log('Express listening on port: ' + PORT);
   });
