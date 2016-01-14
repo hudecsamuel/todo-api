@@ -51,11 +51,16 @@ app.get('/todos', middleware.requireAuthentication, function(req, res){
 app.get('/todos/:id', middleware.requireAuthentication, function(req, res){
   var todoId = parseInt(req.params.id);
 
-  db.todo.findById(todoId).then(function(todo){
+  db.todo.findOne({
+    where: {
+      id:todoId,
+      userId: req.user.id
+    }
+  }).then(function(todo){
 
     if(!!todo){
       //  res.status(401).json(todo);
-      res.status(401).json(todo.toJSON());
+      res.json(todo.toJSON());
     } else {
       res.status(404).json({"error": "Todo not found."})
     }
@@ -86,7 +91,8 @@ app.delete('/todos/:id', middleware.requireAuthentication, function(req, res){
   var todoId = parseInt(req.params.id);
 
   db.todo.destroy({where:{
-    id: todoId
+    id: todoId,
+    userId: req.user.id
   }}).then(function(rowsDeleted){
     if(rowsDeleted === 0) {
       res.status(404).json({"error": "No todo with specified id found"});
@@ -113,7 +119,10 @@ app.put('/todos/:id', middleware.requireAuthentication, function(req, res){
     attributes.description = body.description;
   }
 
-  db.todo.findById(todoId)
+  db.todo.findOne({where: {
+    id: todoId,
+    userId: req.user.id
+  }})
   .then(function(todo){
     if(todo){
       todo.update(attributes).then(function(todo){
